@@ -1,0 +1,449 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Game Design Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: single centered column (max 1120px); split hero (text + live-ops loop widget), numbered sections, card grids.
+   Light-only by design: white ground with a faint graph-paper grid. */
+:root{
+  --bg:#ffffff; --surface:#ffffff; --surface-2:#f4f3fd; --fg:#15142b; --muted:#4a4966; --line:#e4e3f0;
+  --grid:#efeef7; --grid-strong:#e6e4f4;
+  --block:#f3f1fe; --block-line:#dcd7fb;
+  --w-bg:#13122a; --w-node:#1e1c3c; --w-line:#2f2c58; --w-fg:#eeedf9; --w-muted:#a7a5c8; --w-hot:#2a2670; --w-accent:#8b85ff; --w-ok:#3cc995;
+  --accent:#4f46e5; --accent-hover:#4338ca;
+  --accent-grad:linear-gradient(135deg,#7c6cf6 0%,#4f46e5 55%,#4338ca 100%);
+  --accent-grad-hover:linear-gradient(135deg,#6d5cf0 0%,#4338ca 60%,#3730a3 100%); --accent-soft:#eceafd; --accent-fg:#ffffff; --ok:#0f8a5f;
+  --f-display:"Plus Jakarta Sans", "Segoe UI", system-ui, sans-serif;
+  --f-body:"Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"Plus Jakarta Sans", "Segoe UI", system-ui, sans-serif;
+  color-scheme:light;
+}
+
+*{box-sizing:border-box}
+body{
+  background-color:var(--bg);
+  background-image:
+    linear-gradient(var(--grid-strong) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-strong) 1px, transparent 1px),
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size:320px 320px,320px 320px,64px 64px,64px 64px;
+  background-position:-1px -1px;
+  color:var(--fg);font-family:var(--f-body);font-size:17px;line-height:1.65;padding-inline:20px}
+a{color:inherit}
+.wrap{max-width:1120px;margin-inline:auto}
+h1,h2,h3,h4{font-family:var(--f-display);line-height:1.15;margin:0;text-wrap:balance}
+p{margin:0}
+
+/* nav */
+.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);margin-inline:-20px;padding:12px 20px}
+.nav .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo{width:34px;height:34px;border-radius:9px;background:var(--accent-grad);color:var(--accent-fg);display:grid;place-items:center;font-family:var(--f-display);font-weight:800;font-size:15px}
+.brand b{display:block;font-size:15px;line-height:1.2}
+.brand small{display:block;font-size:12px;color:var(--muted)}
+.links{display:flex;gap:4px;flex-wrap:wrap}
+.links a{text-decoration:none;font-size:14px;font-weight:500;color:var(--muted);padding:6px 10px;border-radius:8px}
+.links a:hover,.links a:focus-visible{color:var(--fg);background:var(--surface-2)}
+
+/* buttons */
+.btns{display:flex;gap:10px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:8px;text-decoration:none;font-weight:600;font-size:15px;padding:11px 18px;border-radius:10px;border:1.5px solid var(--accent);transition:background .15s,transform .15s}
+.btn.primary{background:var(--accent-grad);color:var(--accent-fg);border-color:transparent;box-shadow:0 6px 16px -8px rgba(79,70,229,.6)}
+.btn.primary:hover{background:var(--accent-grad-hover);transform:translateY(-1px)}
+.btn.ghost{background:var(--surface);color:var(--accent)}
+.btn.ghost:hover{background:var(--accent-soft)}
+.btn:focus-visible,.links a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* hero */
+.hero{display:grid;grid-template-columns:1.05fr 1fr;gap:48px;align-items:center;padding-block:64px 56px}
+.hero>*{min-width:0}
+.who{display:flex;align-items:center;gap:16px;margin-bottom:18px}
+.avatar{width:72px;height:72px;border-radius:50%;background:var(--accent-grad);color:var(--accent-fg);display:grid;place-items:center;font-family:var(--f-display);font-weight:800;font-size:24px;flex:none}
+.eyebrow{font-family:var(--f-mono);font-size:12.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+.hero h1{font-size:clamp(40px,6vw,64px);font-weight:800;letter-spacing:-.02em}
+.lede{font-size:18px;color:var(--muted);max-width:34em;margin-top:16px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-block:28px}
+.stat{border-left:2px solid var(--accent);padding:2px 0 2px 12px}
+.stat strong{display:block;font-family:var(--f-display);font-size:24px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--accent);background:var(--accent-grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.stat span{font-size:13px;color:var(--muted);line-height:1.35;display:block}
+
+/* loop widget */
+.widget{background:var(--w-bg);color:var(--w-fg);border:1px solid var(--w-line);border-radius:16px;padding:20px;box-shadow:0 18px 40px -24px color-mix(in srgb,var(--accent) 45%,transparent)}
+.widget-top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.widget-top .eyebrow{color:var(--w-muted)}
+.widget .node{background:var(--w-node);border-color:var(--w-line)}
+.widget .node small{color:var(--w-muted)}
+.widget .node.hot{background:var(--w-hot);border-color:var(--w-accent)}
+.widget .arrow{color:var(--w-accent)}
+.widget .chip{background:transparent;border-color:var(--w-line);color:var(--w-fg)}
+.widget .trio .node.step.on{border-color:var(--w-accent);box-shadow:0 0 0 1px var(--w-accent) inset}
+.widget .live{color:var(--w-ok)}
+.widget .live i{background:var(--w-ok)}
+.live{display:inline-flex;align-items:center;gap:6px;font-family:var(--f-mono);font-size:11px;color:var(--ok)}
+.live i{width:7px;height:7px;border-radius:50%;background:var(--ok);animation:pulse 1.6s infinite}
+@keyframes pulse{50%{opacity:.25}}
+.node{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--surface-2)}
+.node small{display:block;font-family:var(--f-mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.node b{font-size:14.5px}
+.node.hot{background:var(--accent-soft);border-color:color-mix(in srgb,var(--accent) 40%,var(--line))}
+.arrow{text-align:center;color:var(--accent);font-size:14px;line-height:1;padding:6px 0}
+.trio{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.trio .node{text-align:center;padding:10px 6px}
+.trio .node b{font-size:13.5px;line-height:1.3;display:block}
+.trio .node small{margin-top:4px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.chip{font-size:12px;font-weight:500;padding:3px 9px;border-radius:999px;background:var(--surface);border:1px solid var(--block-line);color:var(--accent-hover)}
+.trio .node.step{opacity:.55;transition:opacity .3s,border-color .3s}
+.trio .node.step.on{opacity:1;border-color:var(--accent)}
+.widget-cap{font-size:13px;color:var(--w-muted);margin-top:14px}
+
+/* sections */
+section.block{padding-block:64px}
+.head{max-width:44em;margin-bottom:32px}
+.head h2{font-size:clamp(28px,4vw,40px);font-weight:700;margin-top:8px;letter-spacing:-.01em}
+.head p{color:var(--muted);margin-top:10px}
+
+/* featured */
+.feature{display:grid;grid-template-columns:1.1fr 1fr;gap:28px;background:var(--block);border:1px solid var(--block-line);border-radius:18px;padding:28px;margin-bottom:20px}
+.feature>*{min-width:0}
+.tag{display:inline-block;font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;background:var(--accent-grad);color:var(--accent-fg);padding:4px 10px;border-radius:999px}
+.feature h3{font-size:28px;margin-block:12px 10px}
+.feature p{color:var(--muted)}
+.feature .chips{margin-block:16px 20px}
+.steps{list-style:none;margin:0;padding:0;display:grid;gap:10px;counter-reset:s}
+.steps li{display:grid;grid-template-columns:30px 1fr;gap:12px;align-items:start;background:var(--surface);border:1px solid var(--block-line);border-radius:12px;padding:12px 14px}
+.steps li::before{counter-increment:s;content:counter(s);width:26px;height:26px;border-radius:7px;background:var(--accent-grad);color:var(--accent-fg);display:grid;place-items:center;font-family:var(--f-mono);font-size:12px}
+.steps b{display:block;font-size:15px}
+.steps span{font-size:14px;color:var(--muted);line-height:1.45}
+
+.cards{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+.card{background:var(--block);border:1px solid var(--block-line);border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:12px;transition:border-color .2s,transform .2s}
+.card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.card .num{font-family:var(--f-mono);font-size:12px;color:var(--accent)}
+.card h3{font-size:22px}
+.card p{color:var(--muted);font-size:15px}
+.kv{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:auto;padding:12px 14px;background:var(--surface);border:1px solid var(--block-line);border-radius:10px}
+.kv>div{min-width:0}
+.kv>div+div{border-left:1px solid #e8e7ef;padding-left:10px}
+.kv strong{display:block;font-size:14px;line-height:1.3;overflow-wrap:anywhere}
+.kv span{display:block;font-size:12px;color:var(--muted);margin-bottom:2px}
+.more{display:flex;justify-content:flex-start;margin-top:24px}
+
+/* work-on grid */
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.tile{padding:22px;border-radius:14px;background:var(--block);border:1px solid var(--block-line)}
+.tile .ico{width:36px;height:36px;border-radius:9px;background:var(--accent-grad);color:var(--accent-fg);display:grid;place-items:center;margin-bottom:12px}
+.tile h4{font-size:18px;margin-bottom:6px}
+.tile p{font-size:15px;color:var(--muted)}
+
+/* skills */
+.skill{padding:22px;border-radius:14px;background:var(--block);border:1px solid var(--block-line);display:flex;flex-direction:column;gap:12px}
+.skill h4{font-size:19px}
+.skill .lbl{font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.skill ul{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.skill li a{display:flex;justify-content:space-between;text-decoration:none;font-weight:500;font-size:15px;padding:7px 10px;border-radius:8px;background:var(--surface);border:1px solid var(--block-line)}
+.skill li a:hover{color:var(--accent)}
+.skill li a i{font-style:normal;color:var(--accent)}
+
+/* about */
+.about{display:grid;grid-template-columns:220px 1fr;gap:40px;align-items:start}
+.about>*{min-width:0}
+.portrait{aspect-ratio:1;max-width:100%;border-radius:18px;background:repeating-linear-gradient(135deg,var(--accent-soft) 0 12px,var(--surface-2) 12px 24px);border:1px dashed color-mix(in srgb,var(--accent) 45%,var(--line));display:grid;place-items:center;text-align:center;color:var(--muted);font-size:13px;padding:16px}
+.about-text{display:grid;gap:14px;max-width:40em}
+.about-text p{font-size:17px}
+.about-text p.muted{color:var(--muted)}
+.ph{background:var(--accent-soft);color:var(--accent);padding:0 4px;border-radius:4px}
+
+footer{padding-block:40px 56px;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:28px}
+footer>*{min-width:0}
+footer h5{font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 10px;font-weight:500}
+footer a{display:block;text-decoration:none;color:var(--muted);font-size:14px;padding:3px 0}
+footer a:hover{color:var(--accent)}
+footer p{color:var(--muted);font-size:14px}
+.copy{grid-column:1/-1;font-size:13px;color:var(--muted);padding-top:20px}
+
+/* photos */
+.avatar{overflow:hidden;padding:0}
+.avatar img,.portrait img{width:100%;height:100%;object-fit:cover;display:block}
+.portrait.has-photo{padding:0;overflow:hidden;border:1px solid var(--block-line);background:var(--surface)}
+.portrait.has-photo img{object-position:center 20%}
+
+/* featured game art */
+.shots{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.shot{margin:0;background:var(--surface);border:1px solid var(--block-line);border-radius:14px;overflow:hidden}
+.shot img{width:100%;aspect-ratio:1591/829;object-fit:cover;object-position:top;display:block}
+.shot figcaption{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:10px 14px;font-size:14px}
+.shot figcaption b{font-family:var(--f-display)}
+.shot figcaption span{color:var(--muted);font-size:13px}
+.meta{font-size:14px;color:var(--fg);font-weight:600;margin-bottom:8px}
+.rights{grid-column:1/-1;font-size:12px;color:var(--muted)}
+
+/* résumé modal */
+.resume-modal{border:0;padding:0;border-radius:18px;width:min(860px,calc(100vw - 32px));max-height:calc(100vh - 48px);background:var(--surface);color:var(--fg);box-shadow:0 30px 80px -20px rgba(21,20,43,.55);overflow:hidden}
+.resume-modal::backdrop{background:rgba(19,18,42,.6);backdrop-filter:blur(3px)}
+.resume-modal[open]{display:flex;flex-direction:column}
+.rm-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.rm-bar b{font-family:var(--f-display);font-size:17px}
+.rm-actions{display:flex;gap:8px}
+.rm-actions .btn{padding:7px 14px;font-size:14px}
+.rm-close{appearance:none;border:1.5px solid var(--line);background:var(--surface);color:var(--fg);border-radius:10px;width:36px;height:36px;font-size:18px;cursor:pointer}
+.rm-close:hover{border-color:var(--accent);color:var(--accent)}
+.rm-body{overflow:auto;background:var(--surface-2);padding:16px}
+.rm-body img{display:block;width:100%;max-width:780px;margin-inline:auto;border-radius:6px;box-shadow:0 4px 18px -6px rgba(21,20,43,.3)}
+
+@media (max-width:900px){
+  .hero,.feature,.about{grid-template-columns:1fr}
+  .grid3{grid-template-columns:1fr 1fr}
+  footer{grid-template-columns:1fr 1fr}
+  .about .portrait{max-width:200px}
+}
+@media (max-width:620px){
+  .shots{grid-template-columns:1fr}
+  .cards,.grid3{grid-template-columns:1fr}
+  .stats{grid-template-columns:1fr 1fr 1fr;gap:8px}
+  .stat strong{font-size:19px}
+  .trio{grid-template-columns:1fr}
+  footer{grid-template-columns:1fr}
+  .hero{padding-block:40px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="#top"><span class="logo">JS</span><span><b>Jiyeon Seo</b><small>Game Design · Live Ops · Data Analysis</small></span></a>
+    <nav class="links" aria-label="Main">
+      <a href="#work">Projects</a><a href="#focus">Focus</a><a href="#skills">Skills</a><a href="#about">About</a><a class="js-resume" href="resume.pdf">Résumé</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap" id="top">
+  <section class="hero">
+    <div>
+      <div class="who">
+        <div class="avatar"><img src="photo.jpg" alt="Jiyeon Seo"></div>
+        <div class="eyebrow">Game Designer &amp; Product Analyst</div>
+      </div>
+      <h1>Jiyeon Seo</h1>
+      <p class="lede">I dig into player data, find where a game breaks down, and redesign the systems behind it: levels, economy, and events. Then I lead the team that ships the fix.</p>
+      <div class="stats">
+        <div class="stat"><strong>3.5 yrs</strong><span>Live-service mobile games</span></div>
+        <div class="stat"><strong>GenAI</strong><span>Built into my workflow, from first build to live service</span></div>
+        <div class="stat"><strong>4 originals</strong><span>New games I developed from scratch</span></div>
+      </div>
+      <div class="btns">
+        <a class="btn primary" href="#work">View portfolio</a>
+        <a class="btn ghost js-resume" href="resume.pdf">Résumé</a>
+      </div>
+    </div>
+
+    <aside class="widget" aria-label="How I work: the live-ops loop">
+      <div class="widget-top">
+        <span class="eyebrow">How I work · live-ops loop</span>
+        <span class="live"><i></i>each update</span>
+      </div>
+      <div class="node">
+        <small>Source</small>
+        <b>Player data</b>
+        <div class="chips"><span class="chip">Purchase conversion</span><span class="chip">Item sink</span><span class="chip">Event package sales</span></div>
+      </div>
+      <div class="arrow">↓</div>
+      <div class="node hot">
+        <small>Analysis</small>
+        <b>Pinpoint problems in the metrics</b>
+      </div>
+      <div class="arrow">↓</div>
+      <div class="trio" id="trio">
+        <div class="node step on"><b>Level difficulty</b><small>Tuning</small></div>
+        <div class="node step"><b>Game economy</b><small>Rebalance</small></div>
+        <div class="node step"><b>Events &amp; packages</b><small>New content</small></div>
+      </div>
+      <div class="arrow">↓</div>
+      <div class="node">
+        <small>Delivered</small>
+        <b>Next update, shipped with art, engineering &amp; animation</b>
+      </div>
+      <p class="widget-cap">The loop I ran for 3.5 years on Friends Town and Friends Popcorn: measure, diagnose, redesign, ship, measure again.</p>
+    </aside>
+  </section>
+
+  <section class="block" id="work">
+    <div class="head">
+      <div class="eyebrow">01 · Selected work</div>
+      <h2>Games I've designed and led</h2>
+      <p>Professional live-ops work first, followed by the games I led and designed in school.</p>
+    </div>
+
+    <article class="feature">
+      <div class="shots">
+        <figure class="shot"><img src="friends-town.jpg" alt="Friends Town key art"><figcaption><b>Friends Town</b><span>Led the full product cycle</span></figcaption></figure>
+        <figure class="shot"><img src="friends-popcorn.jpg" alt="Friends Popcorn for Kakao key art"><figcaption><b>Friends Popcorn</b><span>Collab analytics &amp; user testing</span></figcaption></figure>
+      </div>
+      <div>
+        <span class="tag">Industry · 3.5 years</span>
+        <h3>Friends Town &amp; Friends Popcorn</h3>
+        <p class="meta">Product Specialist · Metabora (King Studio) · Apr 2023 – Aug 2026</p>
+        <p>On two live casual mobile games, I analyzed retention, IAP conversion, item consumption, and event package data, pinpointed where players got stuck, and shipped changes to fix it. On Friends Town, I led the full product cycle. On Friends Popcorn, I analyzed key metrics and planned user tests for the Crayon Shin-chan collaboration.</p>
+        <div class="chips"><span class="chip">Metric analysis</span><span class="chip">Level design</span><span class="chip">Economy design</span><span class="chip">Event design</span><span class="chip">IAP conversion</span><span class="chip">Pop-up store</span></div>
+        <div class="btns">
+          <a class="btn primary" href="#work">Read the case study</a>
+          <a class="btn ghost js-resume" href="resume.pdf">Résumé</a>
+        </div>
+      </div>
+      <ol class="steps">
+        <li><div><b>Analyze the metrics</b><span>Tracked retention, IAP conversion, item consumption, and event package performance.</span></div></li>
+        <li><div><b>Spot the problem</b><span>Found where players stalled, hoarded items, or skipped offers.</span></div></li>
+        <li><div><b>Redesign the system</b><span>Tuned stage difficulty curves and stage distribution, rebalanced the economy, and designed new events.</span></div></li>
+        <li><div><b>Build tools, align &amp; ship</b><span>Co-built an automated balancing tool with engineers, worked closely with art and animation, and ran an offline pop-up store.</span></div></li>
+      </ol>
+      <p class="rights">Game art © its respective rights holders, shown to illustrate my work on these titles.</p>
+    </article>
+
+    <div class="cards">
+      <article class="card">
+        <span class="num">01 · Match-3 puzzle · Mobile</span>
+        <h3>Adventure Match!</h3>
+        <p>A match-3 puzzle game in development, targeting release in the first half of 2027. I direct the project and own the full design: systems, economy, and levels.</p>
+        <div class="chips"><span class="chip">System design</span><span class="chip">Economy design</span><span class="chip">Level design</span></div>
+        <div class="kv"><div><span>Genre</span><strong>Match-3</strong></div><div><span>Platform</span><strong>App Store &amp; Google Play</strong></div><div><span>Engine</span><strong>Unity</strong></div></div>
+      </article>
+      <article class="card">
+        <span class="num">02 · 3D platformer · PC</span>
+        <h3>The Witch's House</h3>
+        <p>A 3D platformer about escaping a witch's house. As project lead, I designed the levels, narrative, puzzle solutions, and the difficulty of each room.</p>
+        <div class="chips"><span class="chip">Level design</span><span class="chip">Narrative design</span></div>
+        <div class="kv"><div><span>Genre</span><strong>3D Platformer</strong></div><div><span>Platform</span><strong>Steam</strong></div><div><span>Engine</span><strong>Unreal Engine</strong></div></div>
+      </article>
+      <article class="card">
+        <span class="num">03 · Campaign game · 2D</span>
+        <h3>Covid Jump</h3>
+        <p>A campaign game made during the COVID-19 pandemic with one simple message: we'll get through this together.</p>
+        <div class="chips"><span class="chip">Level design</span><span class="chip">Art direction</span></div>
+        <div class="kv"><div><span>Genre</span><strong>2D Platformer</strong></div><div><span>Award</span><strong>Progress@Play Awards</strong></div><div><span>Engine</span><strong>Unity</strong></div></div>
+      </article>
+      <article class="card">
+        <span class="num">04 · Campaign game · 3D</span>
+        <h3>City Plogger</h3>
+        <p>An endless runner inspired by plogging, the practice of picking up litter while jogging. It turns cleaning up the city into a playful habit.</p>
+        <div class="chips"><span class="chip">System design</span><span class="chip">Level design</span></div>
+        <div class="kv"><div><span>Genre</span><strong>3D Endless Runner</strong></div><div><span>Award</span><strong>Progress@Play Awards</strong></div><div><span>Engine</span><strong>Unity</strong></div></div>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" id="focus">
+    <div class="head">
+      <div class="eyebrow">02 · What I work on</div>
+      <h2>From the numbers to the next update</h2>
+      <p>The problems I love to solve.</p>
+    </div>
+    <div class="grid3">
+      <div class="tile"><div class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></div><h4>Metric Analysis</h4><p>Reading purchase conversion, item consumption, and event package performance as signals of player behavior.</p></div>
+      <div class="tile"><div class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg></div><h4>Problem Detection</h4><p>Finding the level, offer, or currency behind a drop before it becomes a trend.</p></div>
+      <div class="tile"><div class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/></svg></div><h4>Level &amp; Difficulty</h4><p>Level layouts and difficulty curves tuned with live data.</p></div>
+      <div class="tile"><div class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><path d="M12 8v8M9.5 10.5h4a1.5 1.5 0 0 1 0 3h-3"/></svg></div><h4>Economy Design</h4><p>Balancing currency and item sources and sinks to keep the economy healthy.</p></div>
+      <div class="tile"><div class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></div><h4>Events &amp; Live Ops</h4><p>Designing events and packages around what the data says players need next.</p></div>
+      <div class="tile"><div class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M2 20c0-3 3-5 6-5s6 2 6 5M14 20c0-2 1.5-4 4-4s4 2 4 4"/></svg></div><h4>Project Leadership</h4><p>Leading projects and aligning cross-functional teams, including for an offline pop-up store.</p></div>
+    </div>
+  </section>
+
+  <section class="block" id="skills">
+    <div class="head">
+      <div class="eyebrow">03 · Skills</div>
+      <h2>What I bring to a team</h2>
+      <p>Select a skill to see the project behind it.</p>
+    </div>
+    <div class="grid3">
+      <div class="skill">
+        <h4>Data &amp; Analysis</h4>
+        <span class="lbl">Shown in</span>
+        <ul><li><a href="#work">Conversion analysis<i>→</i></a></li><li><a href="#work">Item consumption tracking<i>→</i></a></li><li><a href="#work">Collab metrics · Friends Popcorn<i>→</i></a></li></ul>
+        <span class="lbl">Tools</span>
+        <div class="chips"><span class="chip">SQL</span><span class="chip">Power BI</span><span class="chip">Google Analytics</span><span class="chip">Excel</span></div>
+      </div>
+      <div class="skill">
+        <h4>Game Design</h4>
+        <span class="lbl">Shown in</span>
+        <ul><li><a href="#work">Level design · Adventure Match!<i>→</i></a></li><li><a href="#work">Narrative · The Witch's House<i>→</i></a></li><li><a href="#work">Stage design · Friends Town<i>→</i></a></li></ul>
+        <span class="lbl">Tools</span>
+        <div class="chips"><span class="chip">Confluence</span><span class="chip">Microsoft Office</span></div>
+      </div>
+      <div class="skill">
+        <h4>Leadership &amp; Ops</h4>
+        <span class="lbl">Shown in</span>
+        <ul><li><a href="#work">Product cycle lead · Friends Town<i>→</i></a></li><li><a href="#work">Cross-functional communication<i>→</i></a></li><li><a href="#work">Offline pop-up store<i>→</i></a></li></ul>
+        <span class="lbl">Tools</span>
+        <div class="chips"><span class="chip">Jira</span><span class="chip">Excel</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="about">
+    <div class="about">
+      <div class="portrait has-photo"><img src="photo.jpg" alt="Jiyeon Seo"></div>
+      <div class="about-text">
+        <div class="eyebrow">04 · About me</div>
+        <p>I'm a game designer who lets data guide design. For 3.5 years, I worked as a Product Specialist at Metabora (King Studio) on <i>Friends Town</i> and <i>Friends Popcorn</i>. I studied how players spent, saved, and got stuck, then turned those insights into changes to stages, the economy, and events.</p>
+        <p>I'm studying Computer Game Design at George Mason University, where I serve as Student Representative (President) of the Department of Game Design and received the Student of the Year Award in 2022. There, I led and designed <i>Adventure Match!</i> and <i>The Witch's House</i>, and created two campaign games, <i>Covid Jump</i> and <i>City Plogger</i>.</p>
+        <p class="muted">What drives me is making games measurably better for the people who play them. Outside of work, you'll find me hiking, canoeing, or barbecuing at a campsite.</p>
+        <div class="btns"><a class="btn primary" href="https://www.linkedin.com/in/jiyeon-seo-84779a248/" target="_blank" rel="noopener">Connect on LinkedIn</a><a class="btn ghost js-resume" href="resume.pdf">Résumé</a></div>
+      </div>
+    </div>
+  </section>
+
+  <footer id="contact">
+    <div>
+      <a class="brand" href="#top" style="padding:0;margin-bottom:10px"><span class="logo">JS</span><span><b style="color:var(--fg)">Jiyeon Seo</b></span></a>
+      <p>Game Designer &amp; Product Analyst. Open to roles in game design, live ops, and product analysis.</p>
+      <p style="margin-top:8px;color:var(--fg);user-select:all">sjyremi@gmail.com</p>
+    </div>
+    <div><h5>Pages</h5><a href="#top">Home</a><a href="#work">Projects</a><a href="#about">About</a><a class="js-resume" href="resume.pdf">Résumé ↗</a></div>
+    <div><h5>Elsewhere</h5><a href="https://www.linkedin.com/in/jiyeon-seo-84779a248/" target="_blank" rel="noopener">LinkedIn ↗</a></div>
+    <div class="copy">© Jiyeon Seo · Game design portfolio</div>
+  </footer>
+</main>
+
+<dialog class="resume-modal" id="resumeModal" aria-label="Résumé">
+  <div class="rm-bar">
+    <b>Jiyeon Seo · Résumé</b>
+    <div class="rm-actions">
+      <a class="btn ghost" href="resume.pdf" target="_blank" rel="noopener">Open PDF ↗</a>
+      <button class="rm-close" type="button" id="rmClose" aria-label="Close">✕</button>
+    </div>
+  </div>
+  <div class="rm-body"><img src="resume.jpg" alt="Résumé of Jiyeon Seo"></div>
+</dialog>
+
+<script>
+(function(){
+  var dlg = document.getElementById('resumeModal');
+  document.querySelectorAll('.js-resume').forEach(function(a){
+    a.addEventListener('click', function(e){
+      if (!dlg.showModal) return;
+      e.preventDefault(); dlg.showModal();
+    });
+  });
+  document.getElementById('rmClose').addEventListener('click', function(){ dlg.close(); });
+  dlg.addEventListener('click', function(e){ if (e.target === dlg) dlg.close(); });
+})();
+(function(){
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var steps = document.querySelectorAll('#trio .step'), i = 0;
+  setInterval(function(){
+    steps[i].classList.remove('on');
+    i = (i + 1) % steps.length;
+    steps[i].classList.add('on');
+  }, 1800);
+})();
+</script>
+</body>
+</html>
